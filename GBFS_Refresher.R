@@ -7,7 +7,7 @@
 rm(list = ls())
 options(stringsAsFactors = FALSE)
 table = function (..., useNA = 'ifany') base::table(..., useNA = useNA)
-dir_prefix = "/ts/STAFF FOLDERS/Kyle Douglas/gbfs/"
+dir_prefix = "C:/Users/kdouglas/Documents/github/GBFS_Bike_Angels/"
 
 gc()
 
@@ -93,19 +93,16 @@ Dist_Matrix$From %<>% as.numeric()
 THRESH = 1.0
 
 write.csv(Dist_Matrix[!is.na(Dist_Matrix$Angel_Pts_Per_Mi) & Dist_Matrix$Angel_Pts_Per_Mi >= THRESH, !(names(Dist_Matrix) %in% c("From_Name", "To_Name"))],
-          # file = paste0("G:/STAFF FOLDERS/Kyle Douglas/gbfs/Historical_Data/Qual_Trips_", This_Date, "_", gsub(":", "_", This_Time), ".csv"),
-          file = paste0("/ts/STAFF FOLDERS/Kyle Douglas/gbfs/Historical_Data/Qual_Trips_", This_Date, "_", gsub(":", "_", This_Time), ".csv"),
+          file = paste0(dir_prefix, "Historical_Data/Qual_Trips_", This_Date, "_", gsub(":", "_", This_Time), ".csv"),
           row.names = FALSE)
 
 #####################################################################################
 #####################################################################################
 #####################################################################################
 
-# ### Google Sheets API
-# 
-# # gs_auth()
-# # GBFS_Angels = gs_title("GBFS_Angels")
-# GBFS_Angels = gs_url("https://docs.google.com/spreadsheets/d/1qB4jqs61Axmie5BwCLsPAZZU-xq2meupdcijBV7tEtM/edit?usp=sharing")
-# # GBFS_Angels = gs_url("https://docs.google.com/spreadsheets/d/e/2PACX-1vQmHgfQzcsYie_TSroe-g4HFoi3BDLjssJnjJJ9AxTZT2huQwcF2KJHNAdTiLjpksqJwTAIEzlEztPD/pubhtml")
-# GBFS_Angels = GBFS_Angels %>% gs_ws_rename(from = gs_ws_ls(GBFS_Angels)[1], to = paste0(This_Date, " @ ", This_Time))
-# GBFS_Angels = GBFS_Angels %>% gs_edit_cells(input = head(Dist_Matrix[, !(names(Dist_Matrix) %in% c("Date", "Time"))], 25), trim = TRUE)
+### Refresh using the Google Sheets API (googlesheets package)
+
+gs_auth(token = paste0(dir_prefix, "kwdougla_googlesheets_token.rds"))
+GBFS_Angels = gs_title("GBFS_Angels")
+GBFS_Angels = GBFS_Angels %>% gs_ws_rename(from = gs_ws_ls(GBFS_Angels)[1], to = paste0(This_Date, " @ ", This_Time))
+GBFS_Angels = GBFS_Angels %>% gs_edit_cells(input = head(Dist_Matrix[, !(names(Dist_Matrix) %in% c("Date", "Time"))], 25), trim = TRUE)
